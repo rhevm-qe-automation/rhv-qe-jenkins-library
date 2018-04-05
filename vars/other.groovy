@@ -3,15 +3,23 @@ def get_locked_resources() {
 }
 
 def get_locked_ge_name() {
-  get_locked_resources()[0].getName()
+  return get_locked_resources()[0].getName()
 }
 
 def get_locked_ge_labels() {
-  get_locked_resources()[0].getLabels()
+  return get_locked_resources()[0].getLabels()
 }
 
-def is_he_env() {
-  get_locked_ge_labels().contains("he-env")
+def get_resources_with_label(label){
+  return org.jenkins.plugins.lockableresources.LockableResourcesManager.class.get().getResourcesWithLabel(label, null)
+}
+
+def get_resource_labels(label){
+  return get_resources_with_label(label)[0].getLabels()
+}
+
+def is_he_env(env_name) {
+  return get_resource_labels(env_name).contains("he-env")
 }
 
 def get_username() {
