@@ -20,6 +20,7 @@ package rhvqe
  *   args.jobUrl: Job name in Jenkins. Ex. rhv-ge-4.2-flow-infra
  *   args.jobParameters: Parameters to be passed to the job.
  *   args.jobStable: If false job is handled as not stabled. In this case the pipeline will conitnue even if it failed.
+ *   args.jobDelay: If you want to delay of the execution (Good for ordering).
  */
 def createNewJob(args)
 {
@@ -31,6 +32,8 @@ def createNewJob(args)
           _jobMailBody,
           _args.jobVersion
         )
+        def jobDelay = args.jobDelay ?: 0
+        sleep jobDelay
         def current_job = jobs.build_job(
           _args.jobUrl, _args.jobParameters, _args.jobStable
         )
