@@ -4,11 +4,11 @@ def call(Map config = [:]) {
     // Scripted Pipeline
     def toolPath = "venv-ansible"
     def playbook = config.get('playbook')
-    def inventory = config.get('inventory', "inventory")
+    def inventory = config.get('inventory', "jenkins/qe/v2v/inventory")
     def tags = config.get('tags', [])
     def extraVars = config.get('extraVars', [])
-    def gitUrl = config.get('gitUrl', 'https://github.com/petr-balogh/venv-ansible.git')
-    def gitBranch = config.get('gitBranch', 'master')
+    def gitUrl = config.get('gitUrl', 'https://github.com/kobihk/venv-ansible.git')
+    def gitBranch = config.get('gitBranch', 'add_req_master')
     def ansibleParams = ""
     if (tags) {
       ansibleParams += "--tags ${tags.join(',')}"
@@ -16,7 +16,7 @@ def call(Map config = [:]) {
     extraVars.each {
       ansibleParams += " -e ${it}"
     }
-    echo "All assible params: ${ansibleParams}"
+    echo "All ansible params: ${ansibleParams}"
     dir (toolPath) {
       git url: "${gitUrl}", branch: "${gitBranch}"
       ansiColor('xterm') {
