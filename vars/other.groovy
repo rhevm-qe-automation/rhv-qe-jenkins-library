@@ -29,3 +29,27 @@ def get_username() {
   else
     return cause.userId;
 }
+
+def parse_url(failed_job, is_stage=false) {
+  def tokens = failed_job.split('/')
+  if (is_stage) {
+    return tokens[-2]
+  }
+  return tokens[-2] + "/" + tokens[-1]
+}
+
+def get_team_email(url) {
+  if(url.contains('network')){
+    return "rhevm-qe-network@redhat.com"
+  }
+  if(url.contains('compute')){
+    return "mavital-all@redhat.com"
+  }
+  if(url.contains('storage')){
+    return "rhevm-qe-storage@redhat.com"
+  }
+  if(url.contains('coresystem')){
+    return "rhevm-qe-infra@redhat.com"
+  }
+  return "rhv-qe-devops@redhat.com"
+}
