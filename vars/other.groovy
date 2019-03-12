@@ -43,7 +43,7 @@ def get_team_email(url) {
     return "rhevm-qe-network@redhat.com"
   }
   if(url.contains('compute')){
-    return "mavital-all@redhat.com"
+    return "rhevm-qe-compute@redhat.com"
   }
   if(url.contains('storage')){
     return "rhevm-qe-storage@redhat.com"
