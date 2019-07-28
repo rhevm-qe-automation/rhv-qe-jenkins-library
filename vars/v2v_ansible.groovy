@@ -7,12 +7,17 @@ def call(Map config = [:]) {
     def tags = config.get('tags', [])
     def extraVars = config.get('extraVars', [])
     def ansibleParams = ""
+    def verbosity = ""
+
+    if (config.get('verbosity'))
+      verbosity = config.get('verbosity')
     if (tags) {
       ansibleParams += "--tags ${tags.join(',')}"
     }
     extraVars.each {
       ansibleParams += " -e ${it}"
     }
+    ansibleParams += " ${verbosity}"
     echo "All ansible params: ${ansibleParams}"
     dir ('venv-ansible') {
       ansiColor('xterm') {
