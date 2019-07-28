@@ -8,9 +8,9 @@ def call(Map config = [:]) {
     def extraVars = config.get('extraVars', [])
     def ansibleParams = ""
     def verbosity = ""
-
-    if (config.get('verbosity'))
+    if (config.get('verbosity')) {
       verbosity = config.get('verbosity')
+    }
     if (tags) {
       ansibleParams += "--tags ${tags.join(',')}"
     }
