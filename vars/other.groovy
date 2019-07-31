@@ -11,18 +11,19 @@
 def get_v2v_current_stage(start_stage, only_stage) {
   def stages = [
                 'Create VMs':true,
+                'Remove RHV VMs':true,
                 'Install Nmon':true,
                 'Add extra providers':true,
                 'Set RHV provider concurrent VM migration max':true,
-                'Conversion hosts enable':true,
                 'Configure oVirt conversion hosts':true,
                 'Configure ESX hosts':true,
+                'SSH Configuration':true,
+                'Conversion hosts enable':true,
                 'Create transformation mappings':true,
                 'Create transformation plans':true,
                 'Start performance monitoring':true,
                 'Execute transformation plans':true,
-                'Monitor transformation plans':true,
-                'Stop performance monitoring':true
+                'Monitor transformation plans':true
                 ]
 
   for (stage in stages) {
