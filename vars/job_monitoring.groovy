@@ -63,28 +63,28 @@ def call(Map config = [:]) {
     def url = env.BUILD_URL + "api/json"
     def response = url.toURL().text
 
-    sh "rm -rf rhevm-jenkins && git clone git://git.app.eng.bos.redhat.com/rhevm-jenkins.git && cd rhevm-jenkins \
-        && git fetch https://code.engineering.redhat.com/gerrit/rhevm-jenkins ${cherry_pick} \
-        && git cherry-pick FETCH_HEAD"
+    sh "rm -rf rhevm-qe-infra \
+        && git clone https://code.engineering.redhat.com/gerrit/rhevm-qe-automation/rhevm-qe-infra.git \
+        && cd rhevm-qe-infra/scripts/production-monitoring"
 
     def build_name = build_info(response)
 
     // Check if the build is upstream-build
     if (build_status) {
       def description = build_info(response, build_status)
-      sh "${WORKSPACE}/rhevm-jenkins/tools/production-monitoring/pygsheets-env.sh ${build_name} ${description} \
+      sh "${WORKSPACE}/rhevm-qe-infra/scripts/production-monitoring/pygsheets-env.sh ${build_name} ${description} \
           ${build_status} ${env.BUILD_URL} is_upstream=true status_update=true"
       return
     }
 
     // Update GE Execution Sheet with pre-build configuration
-    sh "${WORKSPACE}/rhevm-jenkins/tools/production-monitoring/pygsheets-env.sh ${build_name} ${currentBuild.description} \
+    sh "${WORKSPACE}/rhevm-qe-infra/scripts/production-monitoring/pygsheets-env.sh ${build_name} ${currentBuild.description} \
         ${env.BUILD_URL} ${job_name} ${env.JENKINS_URL} ${env.JOB_BASE_NAME} status_update=false"
 
     def build_result = build job: job_name, parameters: job_parameters, propagate: false, wait: true
 
     // Update GE Execution Sheet with post-build configuration
-    sh "${WORKSPACE}/rhevm-jenkins/tools/production-monitoring/pygsheets-env.sh ${build_name} ${currentBuild.description} \
+    sh "${WORKSPACE}/rhevm-qe-infra/scripts/production-monitoring/pygsheets-env.sh ${build_name} ${currentBuild.description} \
         ${build_result.result} is_upstream=false status_update=true"
 
     return build_result
