@@ -12,6 +12,7 @@ def get_v2v_current_stage(start_stage, only_stage) {
   def stages = [
                 'Create VMs':true,
                 'Remove RHV VMs':true,
+                'Add RHV Storage':true,
                 'Install Nmon':true,
                 'Add extra providers':true,
                 'Set RHV provider concurrent VM migration max':true,
