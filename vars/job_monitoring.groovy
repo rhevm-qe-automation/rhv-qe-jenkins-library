@@ -69,17 +69,18 @@ def call(Map config = [:]) {
     sh "rm -rf ${rhevm_qe_infra_dir} && git clone ${rhevm_qe_infra_url}"
     // do the cherry-pick
     if (cherry_pick) {
-      sh """
-        if [ -d ${rhevm_qe_infra_dir} ]; then
-          pushd ${rhevm_qe_infra_dir}
-          for ref in ${cherry_pick}; do
-            git fetch ${rhevm_qe_infra_url} $ref && git cherry-pick FETCH_HEAD || (
-              echo '!!! FAIL TO CHERRYPICK' $ref ; false
+      def refs = cherry_pick.tokenize(' ')
+      refs.each {
+        sh """
+          if [ -d ${rhevm_qe_infra_dir} ]; then
+            pushd ${rhevm_qe_infra_dir}
+            git fetch ${rhevm_qe_infra_url} ${it} && git cherry-pick FETCH_HEAD || (
+                echo '!!! FAIL TO CHERRYPICK' ${it} ; false
             )
-          done
-          popd
-        fi
-      """
+            popd
+          fi
+        """
+      }
     }
 
     def build_name = build_info(response)
