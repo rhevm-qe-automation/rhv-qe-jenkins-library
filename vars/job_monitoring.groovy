@@ -107,7 +107,7 @@ def call(Map config = [:]) {
         ${env.BUILD_URL} \
         ${job_name} \
         ${env.JENKINS_URL} \
-        ${env.JOB_BASE_NAME} status_update=false"
+        ${env.JOB_BASE_NAME} status_update=false
     """
     def build_result = build job: job_name, parameters: job_parameters, propagate: false, wait: true
 
@@ -117,7 +117,7 @@ def call(Map config = [:]) {
         ${build_name} \
         ${currentBuild.description} \
         ${build_result.result} \
-        is_upstream=false status_update=true"
+        is_upstream=false status_update=true
     """
     return build_result
     }
