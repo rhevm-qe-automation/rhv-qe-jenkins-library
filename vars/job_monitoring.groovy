@@ -21,11 +21,11 @@ def build_info(response, parent_pipeline_status =null) {
         if (!description) {
           // Executed only in case of pending job, i.e. 'waiting' status
           response_object.actions[3].parameters.each {
-                                                        if ("${it}".contains("TEXT_BUILD_DESCRIPTION")) {
-                                                          def temp_str = "${it}".split(",")[2].split(':')[1]
-                                                          description = temp_str.substring(0, temp_str.length() - 1)
-                                                        }
-                                                     }
+            if ("${it}".contains("TEXT_BUILD_DESCRIPTION")) {
+              def temp_str = "${it}".split(",")[2].split(':')[1]
+              description = temp_str.substring(0, temp_str.length() - 1)
+            }
+          }
         }
         return description
       }
@@ -59,34 +59,66 @@ def call(Map config = [:]) {
     def cherry_pick = config.get('ref')
     def build_status = config.get('update_status')
 
+    // Define rhevm-qe-infra repo
+    def rhevm_qe_infra_url = "https://code.engineering.redhat.com/gerrit/rhevm-qe-automation/rhevm-qe-infra.git"
+    def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
     // Defining URL for REST API request
     def url = env.BUILD_URL + "api/json"
     def response = url.toURL().text
 
-    sh "rm -rf rhevm-qe-infra \
-        && git clone https://code.engineering.redhat.com/gerrit/rhevm-qe-automation/rhevm-qe-infra.git \
-        && cd rhevm-qe-infra/scripts/production-monitoring"
+    sh "rm -rf ${rhevm_qe_infra_dir} && git clone ${rhevm_qe_infra_url}"
+    // do the cherry-pick
+    if (cherry_pick) {
+      def refs = cherry_pick.tokenize(' ')
+      refs.each {
+        sh """
+          if [ -d ${rhevm_qe_infra_dir} ]; then
+            pushd ${rhevm_qe_infra_dir}
+            git fetch ${rhevm_qe_infra_url} ${it} && git cherry-pick FETCH_HEAD || (
+                echo '!!! FAIL TO CHERRYPICK' ${it} ; false
+            )
+            popd
+          fi
+        """
+      }
+    }
 
     def build_name = build_info(response)
 
     // Check if the build is upstream-build
     if (build_status) {
       def description = build_info(response, build_status)
-      sh "${WORKSPACE}/rhevm-qe-infra/scripts/production-monitoring/pygsheets-env.sh ${build_name} ${description} \
-          ${build_status} ${env.BUILD_URL} is_upstream=true status_update=true"
+      sh """
+        ${rhevm_qe_infra_dir}/scripts/production-monitoring/pygsheets-env.sh \
+          ${build_name} \
+          ${description} \
+          ${build_status} \
+          ${env.BUILD_URL} \
+          is_upstream=true status_update=true
+      """
       return
     }
 
     // Update GE Execution Sheet with pre-build configuration
-    sh "${WORKSPACE}/rhevm-qe-infra/scripts/production-monitoring/pygsheets-env.sh ${build_name} ${currentBuild.description} \
-        ${env.BUILD_URL} ${job_name} ${env.JENKINS_URL} ${env.JOB_BASE_NAME} status_update=false"
-
+    sh """
+      ${rhevm_qe_infra_dir}/scripts/production-monitoring/pygsheets-env.sh \
+        ${build_name} \
+        ${currentBuild.description} \
+        ${env.BUILD_URL} \
+        ${job_name} \
+        ${env.JENKINS_URL} \
+        ${env.JOB_BASE_NAME} status_update=false
+    """
     def build_result = build job: job_name, parameters: job_parameters, propagate: false, wait: true
 
     // Update GE Execution Sheet with post-build configuration
-    sh "${WORKSPACE}/rhevm-qe-infra/scripts/production-monitoring/pygsheets-env.sh ${build_name} ${currentBuild.description} \
-        ${build_result.result} is_upstream=false status_update=true"
-
+    sh """
+      ${rhevm_qe_infra_dir}/scripts/production-monitoring/pygsheets-env.sh \
+        ${build_name} \
+        ${currentBuild.description} \
+        ${build_result.result} \
+        is_upstream=false status_update=true
+    """
     return build_result
     }
 }
