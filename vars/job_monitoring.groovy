@@ -11,7 +11,7 @@ import groovy.json.JsonSlurper
 def rhvh_build_info(job_description) {
   def ver = job_description.split('-')[1]
   def build = sh (
-    script: "${rhevm_qe_infra_dir}/scripts/get_compose_for_rhvh.sh ${ver}"
+    script: "${rhevm_qe_infra_dir}/scripts/get_compose_for_rhvh.sh ${ver}",
     returnStdout: true
   ).trim()
   return (build == 'None') ? 'rhv-unknown' : 'rhv-' + build
