@@ -12,7 +12,7 @@ def rhvh_build_info(job_description) {
     def ver = job_description.split('-')[1]
     def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
     def build = sh (
-      script: "${rhevm_qe_infra_dir}/scripts/get-compose-for-rhvh.sh ${ver}",
+      script: "${rhevm_qe_infra_dir}/scripts/misc/get-compose-for-rhvh.sh ${ver}",
       returnStdout: true
     ).trim()
     return (build == 'None') ? 'rhv-unknown' : 'rhv-' + build
