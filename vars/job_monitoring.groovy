@@ -9,12 +9,13 @@ import groovy.json.JsonSlurper
 * @return build String build of rhv like rhv-4.3.3-2
 */
 def rhvh_build_info(job_description) {
-  def ver = job_description.split('-')[1]
-  def build = sh (
-    script: "${rhevm_qe_infra_dir}/scripts/get_compose_for_rhvh.sh ${ver}",
-    returnStdout: true
-  ).trim()
-  return (build == 'None') ? 'rhv-unknown' : 'rhv-' + build
+    def ver = job_description.split('-')[1]
+    def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
+    def build = sh (
+      script: "${rhevm_qe_infra_dir}/scripts/get_compose_for_rhvh.sh ${ver}",
+      returnStdout: true
+    ).trim()
+    return (build == 'None') ? 'rhv-unknown' : 'rhv-' + build
 }
 
 /**
