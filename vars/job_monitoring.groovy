@@ -101,7 +101,7 @@ def call(Map config = [:]) {
     }
 
     def build_name = build_info(response)
-    if build_name.contains("RHVH") {
+    if (build_name.contains("RHVH")) {
       build_name = rhvh_build_info(build_name)
     }
 
