@@ -1,5 +1,22 @@
 import groovy.json.JsonSlurper
 
+
+/**
+* Try to figure out to which build the rhvh belongs to
+*
+* @param job_description String contains the RHVH build id like RHVH-4.2-20190303.0
+*
+* @return build String build of rhv like rhv-4.3.3-2
+*/
+def rhvh_build_info(job_description) {
+  def ver = job_description.split('-')[1]
+  def build = sh (
+    script: "${rhevm_qe_infra_dir}/scripts/get_compose_for_rhvh.sh ${ver}"
+    returnStdout: true
+  ).trim()
+  return (build == 'None') ? 'rhv-unknown' : 'rhv-' + build
+}
+
 /**
  * Extracts the displayName from given build.
  *
@@ -27,7 +44,7 @@ def build_info(response, parent_pipeline_status =null) {
             }
           }
         }
-        return description
+        return description  // row in google worksheet
       }
 
       // Create URL towards parent build
@@ -39,7 +56,7 @@ def build_info(response, parent_pipeline_status =null) {
       response = url.toURL().text
       response_object = jsonSlurper.parseText(response)
     } catch (Error e){}
-    return response_object.displayName
+    return response_object.displayName // name of google worksheet
 }
 
 /**
@@ -84,6 +101,9 @@ def call(Map config = [:]) {
     }
 
     def build_name = build_info(response)
+    if build_name.contains("RHVH") {
+      build_name = rhvh_build_info(build_name)
+    }
 
     // Check if the build is upstream-build
     if (build_status) {

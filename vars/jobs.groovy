@@ -42,7 +42,7 @@ def build_job(name, parameters, is_stable)
 def build_and_notify(name, parameters, cherry_pick, ignore_unstable=false){
   def current_job = null
   def cause = currentBuild.rawBuild.getCause(hudson.model.Cause$UpstreamCause).toString()
-  if (cause && cause.contains('production-testing-pipeline')) {
+  if (cause && (cause.contains('production-testing-pipeline') || cause.contains('rhvh-pipeline'))) {
     current_job = job_monitoring(ref: cherry_pick, job_parameters: parameters, name: name, update_status: null)
   }
   else {
