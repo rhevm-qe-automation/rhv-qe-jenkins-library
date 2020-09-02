@@ -26,11 +26,11 @@ def createNewJob(args)
 {
     def jobClusure = {
         _args ->
-        def _jobMailBody =  "Scheduling ${_args.jobName} flow, \nplease follow ${_args.jobCurrentBuildUrl} to get more info."
+        def _jobMailBody = "Scheduling ${_args.jobName} flow,\nPlease follow ${_args.jobCurrentBuildUrl} to get more info."
         notification.send_notification(
           _args.jobMailSubject,
           _jobMailBody,
-          _args.jobVersion
+          _args.jobMailRecipients,
         )
         def jobDelay = args.jobDelay ?: 0
         sleep jobDelay

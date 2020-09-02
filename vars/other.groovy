@@ -78,18 +78,18 @@ def parse_url(failed_job, is_stage=false) {
   return tokens[-2] + "/" + tokens[-1]
 }
 
-def get_team_email(url) {
+def get_team_mailing_list(url) {
   if(url.contains('network')){
-    return "rhevm-qe-network@redhat.com"
+    return "rhevm-qe-network"
   }
   if(url.contains('compute')){
-    return "rhevm-qe-compute@redhat.com"
+    return "rhevm-qe-compute"
   }
   if(url.contains('storage')){
-    return "rhevm-qe-storage@redhat.com"
+    return "rhevm-qe-storage"
   }
   if(url.contains('coresystem')){
-    return "rhevm-qe-infra@redhat.com"
+    return "rhevm-qe-infra"
   }
-  return "rhv-qe-devops@redhat.com"
+  return "rhv-qe-devops"
 }
