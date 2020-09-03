@@ -54,7 +54,7 @@ def build_and_notify(name, parameters, cherry_pick, ignore_unstable=false){
       if (ignore_unstable && current_job.result == 'UNSTABLE')
         return
 
-      notification.notificator(env.BUILD_URL, get_job_url(current_job))
+      notification.failed_job_notification(env.BUILD_URL, get_job_url(current_job))
     }
     throw new Exception(other.parse_url(get_job_url(current_job), true) + " has TERMINATED with status " + current_job.result)
   }
