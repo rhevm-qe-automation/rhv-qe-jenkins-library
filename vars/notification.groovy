@@ -9,13 +9,13 @@ Thanks in advance,
 }
 
 
-def failed_job_notification(failed_build, failed_flow){
+def failed_job_notification(failed_build, failed_flow, builder_user="Unknown"){
   def failed_stage = other.parse_url(failed_build)
   def team_email = other.get_team_mailing_list(failed_build)
   def recipient = team_email.contains("rhv-qe-devops")? team_email : "${team_email},rhv-qe-devops"
-  def subject= "[Action Required]: ${failed_stage} has FAILED!"
+  def subject= "[Action Required]: ${failed_stage} has FAILED! (builder user: ${builder_user})"
   def body = """Hi,
-The following job:
+The following job (built by ${builder_user}):
 ${failed_build}consoleFull
 has FAILED in stage:
 ${failed_flow}consoleFull
