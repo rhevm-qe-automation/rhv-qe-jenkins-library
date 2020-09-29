@@ -39,6 +39,10 @@ def build_job(name, parameters, is_stable)
   return job
 }
 
+def getBuildUser() {
+  return currentBuild.rawBuild.getCause(Cause.UserIdCause)?.getUserId() ?: "Unknown"
+}
+
 def build_and_notify(name, parameters, cherry_pick, ignore_unstable=false){
   def current_job = null
   def cause = currentBuild.rawBuild.getCause(hudson.model.Cause$UpstreamCause).toString()
@@ -50,11 +54,11 @@ def build_and_notify(name, parameters, cherry_pick, ignore_unstable=false){
   }
 
   if (current_job.result != 'SUCCESS') {
-    if (env.NODE_NAME.contains('production')) {
+    if (env.NODE_LABELS.contains('production')) {
       if (ignore_unstable && current_job.result == 'UNSTABLE')
         return
 
-      notification.failed_job_notification(env.BUILD_URL, get_job_url(current_job))
+      notification.failed_job_notification(env.BUILD_URL, get_job_url(current_job), getBuildUser())
     }
     throw new Exception(other.parse_url(get_job_url(current_job), true) + " has TERMINATED with status " + current_job.result)
   }
