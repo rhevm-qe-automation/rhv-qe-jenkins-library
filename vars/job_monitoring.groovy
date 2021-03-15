@@ -45,7 +45,7 @@ def build_info(response, parent_pipeline_status =null) {
             }
           }
         }
-        return (description.trim(), null)  // row in google worksheet
+        return [description.trim(), null]  // row in google worksheet
       }
 
       // Create URL towards parent build
@@ -58,7 +58,7 @@ def build_info(response, parent_pipeline_status =null) {
       response_object = jsonSlurper.parseText(response)
     } catch (Error e){}
     def buildType = response_object.description.split(':')[1].trim()
-    return (response_object.displayName, buildType) // name of google worksheet and strategy
+    return [response_object.displayName, buildType] // name of google worksheet and strategy
 }
 
 /**
