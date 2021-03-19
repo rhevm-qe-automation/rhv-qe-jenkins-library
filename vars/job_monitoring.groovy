@@ -57,7 +57,7 @@ def build_info(response, parent_pipeline_status =null) {
       response = url.toURL().text
       response_object = jsonSlurper.parseText(response)
     } catch (Error e){}
-    def buildType = response_object.description.split(':')[1].trim()
+    def buildType = response_object.description ? response_object.description.split(':')[1].trim() : ""
     return [response_object.displayName, buildType] // name of google worksheet and strategy
 }
 
@@ -110,13 +110,14 @@ def call(Map config = [:]) {
     // Check if the build is upstream-build
     if (build_status) {
       def (description, dummy) = build_info(response, build_status)
+      def strategy_arg = strategy ? "strategy=${strategy}" : ""  // No strategy - no Jira ticket
       sh """
         ${rhevm_qe_infra_dir}/scripts/production-monitoring/pygsheets-env.sh \
           ${build_name} \
           '${description}' \
           ${build_status} \
           ${env.BUILD_URL} \
-          is_upstream=true status_update=true strategy=${strategy}
+          is_upstream=true status_update=true ${strategy_arg}
       """
       return
     }
