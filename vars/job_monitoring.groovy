@@ -45,7 +45,7 @@ def build_info(response, parent_pipeline_status =null) {
             }
           }
         }
-        return description  // row in google worksheet
+        return [description.trim(), null]  // row in google worksheet
       }
 
       // Create URL towards parent build
@@ -57,7 +57,8 @@ def build_info(response, parent_pipeline_status =null) {
       response = url.toURL().text
       response_object = jsonSlurper.parseText(response)
     } catch (Error e){}
-    return response_object.displayName // name of google worksheet
+    def buildType = response_object.description.split(':')[1].trim()
+    return [response_object.displayName, buildType] // name of google worksheet and strategy
 }
 
 /**
@@ -101,21 +102,21 @@ def call(Map config = [:]) {
       }
     }
 
-    def build_name = build_info(response)
+    def (build_name, strategy)  = build_info(response)
     if (build_name.contains("RHVH")) {
       build_name = rhvh_build_info(build_name)
     }
 
     // Check if the build is upstream-build
     if (build_status) {
-      def description = build_info(response, build_status).trim()
+      def (description, dummy) = build_info(response, build_status)
       sh """
         ${rhevm_qe_infra_dir}/scripts/production-monitoring/pygsheets-env.sh \
           ${build_name} \
           '${description}' \
           ${build_status} \
           ${env.BUILD_URL} \
-          is_upstream=true status_update=true
+          is_upstream=true status_update=true strategy=${strategy}
       """
       return
     }
