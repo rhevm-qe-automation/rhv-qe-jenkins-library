@@ -45,7 +45,7 @@ def build_info(response, parent_pipeline_status =null) {
             }
           }
         }
-        return [description.trim(), null]  // row in google worksheet
+        return [(description) ? description.trim() : "Unknown" , null]  // row in google worksheet
       }
 
       // Create URL towards parent build
