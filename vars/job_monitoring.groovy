@@ -50,14 +50,14 @@ def build_info(response, parent_pipeline_status =null) {
 
       // Create URL towards parent build
       def url = env.JENKINS_URL \
-             + response_object.actions.causes[0].upstreamUrl.join(", ") \
-             + response_object.actions.causes[0].upstreamBuild.join(", ") \
+             + response_object.actions.causes[0].upstreamUrl[0] \
+             + response_object.actions.causes[0].upstreamBuild[0] \
              + "/api/json"
 
       response = url.toURL().text
       response_object = jsonSlurper.parseText(response)
     } catch (Error e){}
-    def buildType = response_object.description ? response_object.description.split(':')[1].trim() : ""
+    def buildType = (response_object.description) ? response_object.description.split(':')[1].trim() : ""
     return [response_object.displayName, buildType] // name of google worksheet and strategy
 }
 
