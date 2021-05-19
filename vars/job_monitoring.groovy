@@ -38,26 +38,26 @@ def build_info(response, parent_pipeline_status =null) {
 
         if (!description) {
           // Executed only in case of pending job, i.e. 'waiting' status
-          response_object.actions[3].parameters.each {
+          response_object.actions[1].parameters.each {
             if ("${it}".contains("TEXT_BUILD_DESCRIPTION")) {
               def temp_str = "${it}".split(",")[2].split(':')[1]
               description = temp_str.substring(0, temp_str.length() - 1)
             }
           }
         }
-        return [description.trim(), null]  // row in google worksheet
+        return [(description) ? description.trim() : "Unknown" , null]  // row in google worksheet
       }
 
       // Create URL towards parent build
       def url = env.JENKINS_URL \
-             + response_object.actions.causes[0].upstreamUrl.join(", ") \
-             + response_object.actions.causes[0].upstreamBuild.join(", ") \
+             + response_object.actions.causes[0].upstreamUrl[0] \
+             + response_object.actions.causes[0].upstreamBuild[0] \
              + "/api/json"
 
       response = url.toURL().text
       response_object = jsonSlurper.parseText(response)
     } catch (Error e){}
-    def buildType = response_object.description ? response_object.description.split(':')[1].trim() : ""
+    def buildType = (response_object.description) ? response_object.description.split(':')[1].trim() : ""
     return [response_object.displayName, buildType] // name of google worksheet and strategy
 }
 
