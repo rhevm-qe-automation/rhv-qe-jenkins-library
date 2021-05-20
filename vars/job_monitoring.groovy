@@ -38,13 +38,15 @@ def build_info(response, parent_pipeline_status =null) {
 
         if (!description) {
           // Executed only in case of pending job, i.e. 'waiting' status
-          response_object.actions.each { action ->
+          response_object.actions.any { action ->
             if (action.containsKey('parameters')) {
-              action.parameters.each { param ->
+              action.parameters.any { param ->
                 if (param['name'].equals("TEXT_BUILD_DESCRIPTION")) {
                   description = param['value']
+                  return true
                 }
               }
+              return true
             }
           }
         }
