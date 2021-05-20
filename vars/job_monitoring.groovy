@@ -42,8 +42,7 @@ def build_info(response, parent_pipeline_status =null) {
             if (action.containsKey('parameters')) {
               action.parameters.each { param ->
                 if (param['name'].equals("TEXT_BUILD_DESCRIPTION")) {
-                  def temp_str = param['value'].split(",")[2].split(':')[1]
-                  description = temp_str.substring(0, temp_str.length() - 1)
+                  description = param['value']
                 }
               }
             }
