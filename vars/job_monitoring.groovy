@@ -38,10 +38,14 @@ def build_info(response, parent_pipeline_status =null) {
 
         if (!description) {
           // Executed only in case of pending job, i.e. 'waiting' status
-          response_object.actions[1].parameters.each {
-            if ("${it}".contains("TEXT_BUILD_DESCRIPTION")) {
-              def temp_str = "${it}".split(",")[2].split(':')[1]
-              description = temp_str.substring(0, temp_str.length() - 1)
+          response_object.actions.each { action ->
+            if (action.containsKey('parameters')) {
+              action.parameters.each { param ->
+                if (param.contains("TEXT_BUILD_DESCRIPTION")) {
+                  def temp_str = param.split(",")[2].split(':')[1]
+                  description = temp_str.substring(0, temp_str.length() - 1)
+                }
+              }
             }
           }
         }
