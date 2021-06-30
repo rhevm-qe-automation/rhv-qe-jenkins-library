@@ -6,16 +6,26 @@ import groovy.json.JsonSlurper
 *
 * @param job_description String contains the RHVH build id like RHVH-4.2-20190303.0
 *
-* @return build String build of rhv like rhv-4.3.3-2
+* @return build String build of rhv like 4.3.3-2
 */
-def rhvh_build_info(job_description) {
-    def ver = job_description.split('-')[1]
+def rhvh_build_version(job_description) {
+    def ver = job_description.find("[0-9]+.[0-9]+")
     def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
     def build = sh (
       script: "${rhevm_qe_infra_dir}/scripts/misc/get-compose-for-rhvh.sh ${ver}",
       returnStdout: true
     ).trim()
-    return (build == 'None') ? 'rhv-unknown' : 'rhv-' + build
+    return (build == 'None') ? 'unknown' : build
+}
+
+/**
+* Clone the rhevm-qe-infra repository to workspace
+**/
+def clone_infra_repo() {
+    // Define rhevm-qe-infra repo
+    def rhevm_qe_infra_url = "https://code.engineering.redhat.com/gerrit/rhevm-qe-automation/rhevm-qe-infra.git"
+    def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
+    sh "rm -rf ${rhevm_qe_infra_dir} && git clone ${rhevm_qe_infra_url}"
 }
 
 /**
@@ -83,14 +93,13 @@ def call(Map config = [:]) {
     def cherry_pick = config.get('ref')
     def build_status = config.get('update_status')
 
-    // Define rhevm-qe-infra repo
-    def rhevm_qe_infra_url = "https://code.engineering.redhat.com/gerrit/rhevm-qe-automation/rhevm-qe-infra.git"
-    def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
     // Defining URL for REST API request
     def url = env.BUILD_URL + "api/json"
     def response = url.toURL().text
 
-    sh "rm -rf ${rhevm_qe_infra_dir} && git clone ${rhevm_qe_infra_url}"
+    clone_infra_repo()
+    def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
+
     // do the cherry-pick
     if (cherry_pick) {
       def refs = cherry_pick.tokenize(' ')
@@ -109,7 +118,7 @@ def call(Map config = [:]) {
 
     def (build_name, strategy)  = build_info(response)
     if (build_name.contains("RHVH")) {
-      build_name = rhvh_build_info(build_name)
+      build_name = "rhv-" + rhvh_build_version(build_name)
     }
 
     // Check if the build is upstream-build
