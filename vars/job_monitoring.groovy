@@ -99,6 +99,7 @@ def call(Map config = [:]) {
 
     clone_infra_repo()
     def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
+    def rhevm_qe_infra_url = "https://code.engineering.redhat.com/gerrit/rhevm-qe-automation/rhevm-qe-infra.git"
 
     // do the cherry-pick
     if (cherry_pick) {
