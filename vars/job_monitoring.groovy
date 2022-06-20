@@ -128,11 +128,13 @@ def call(Map config = [:]) {
       def strategy_arg = strategy ? "strategy=${strategy}" : ""  // No strategy - no Jira ticket
       sh """
         ${rhevm_qe_infra_dir}/scripts/production-monitoring/pygsheets-env.sh \
-          ${build_name} \
-          '${description}' \
-          ${build_status} \
-          ${env.BUILD_URL} \
-          is_upstream=true status_update=true ${strategy_arg}
+          build_version=${build_name} \
+          build_description=${description} \
+          build_status=${build_status} \
+          build_url=${env.BUILD_URL} \
+          strategy_arg=${strategy_arg} \
+          status_update=true \
+          stage=init
       """
       return
     }
@@ -140,22 +142,24 @@ def call(Map config = [:]) {
     // Update GE Execution Sheet with pre-build configuration
     sh """
       ${rhevm_qe_infra_dir}/scripts/production-monitoring/pygsheets-env.sh \
-        ${build_name} \
-        '${currentBuild.description}' \
-        ${env.BUILD_URL} \
-        ${job_name} \
-        ${env.JENKINS_URL} \
-        ${env.JOB_BASE_NAME} status_update=false
+        build_version=${build_name} \
+        build_description=${currentBuild.description} \
+        build_url=${env.BUILD_URL} \
+        job_name=${job_name} \
+        status_update=false \
+        stage=before_job
     """
     def build_result = build job: job_name, parameters: job_parameters, propagate: false, wait: true
 
     // Update GE Execution Sheet with post-build configuration
     sh """
       ${rhevm_qe_infra_dir}/scripts/production-monitoring/pygsheets-env.sh \
-        ${build_name} \
-        '${currentBuild.description}' \
-        ${build_result.result} \
-        is_upstream=false status_update=true
+        build_version=${build_name} \
+        build_description=${currentBuild.description} \
+        build_url=${env.BUILD_URL} \
+        build_result=${build_result.result} \
+        status_update=true \
+        stage=after_job
     """
     return build_result
     }
