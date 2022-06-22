@@ -125,14 +125,14 @@ def call(Map config = [:]) {
     // Check if the build is upstream-build
     if (build_status) {
       def (description, dummy) = build_info(response, build_status)
-      def strategy_arg = strategy ? "strategy=${strategy}" : ""  // No strategy - no Jira ticket
+      def strategy_arg = strategy ? "${strategy}" : ""  // No strategy - no Jira ticket
       sh """
         ${rhevm_qe_infra_dir}/scripts/production-monitoring/pygsheets-env.sh \
           build_version=${build_name} \
           build_description=${description} \
           build_status=${build_status} \
           build_url=${env.BUILD_URL} \
-          strategy_arg=${strategy_arg} \
+          strategy=${strategy_arg} \
           status_update=true \
           stage=init
       """
