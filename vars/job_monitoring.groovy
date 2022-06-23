@@ -133,7 +133,6 @@ def call(Map config = [:]) {
           build_status=${build_status} \
           build_url=${env.BUILD_URL} \
           strategy=${strategy_arg} \
-          status_update=true \
           stage=init
       """
       return
@@ -146,7 +145,6 @@ def call(Map config = [:]) {
         build_description=${currentBuild.description} \
         build_url=${env.BUILD_URL} \
         job_name=${job_name} \
-        status_update=false \
         stage=before_job
     """
     def build_result = build job: job_name, parameters: job_parameters, propagate: false, wait: true
@@ -158,7 +156,6 @@ def call(Map config = [:]) {
         build_description=${currentBuild.description} \
         build_url=${env.BUILD_URL} \
         build_status=${build_result.result} \
-        status_update=true \
         stage=after_job
     """
     return build_result
