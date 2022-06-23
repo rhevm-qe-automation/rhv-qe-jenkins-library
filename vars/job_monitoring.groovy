@@ -157,7 +157,7 @@ def call(Map config = [:]) {
         build_version=${build_name} \
         build_description=${currentBuild.description} \
         build_url=${env.BUILD_URL} \
-        build_result=${build_result.result} \
+        build_status=${build_result.result} \
         status_update=true \
         stage=after_job
     """
