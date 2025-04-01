@@ -23,7 +23,7 @@ def rhvh_build_version(job_description) {
 **/
 def clone_infra_repo() {
     // Define rhevm-qe-infra repo
-    def rhevm_qe_infra_url = "https://code.engineering.redhat.com/gerrit/rhevm-qe-automation/rhevm-qe-infra.git"
+    def rhevm_qe_infra_url = "https://gitlab.cee.redhat.com/rhevm-qe-automation/rhevm-qe-infra.git"
     def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
     sh "rm -rf ${rhevm_qe_infra_dir} && git clone ${rhevm_qe_infra_url}"
 }
@@ -99,7 +99,7 @@ def call(Map config = [:]) {
 
     clone_infra_repo()
     def rhevm_qe_infra_dir = "${WORKSPACE}/rhevm-qe-infra"
-    def rhevm_qe_infra_url = "https://code.engineering.redhat.com/gerrit/rhevm-qe-automation/rhevm-qe-infra.git"
+    def rhevm_qe_infra_url = "https://gitlab.cee.redhat.com/rhevm-qe-automation/rhevm-qe-infra.git"
 
     // do the cherry-pick
     if (cherry_pick) {
@@ -108,8 +108,8 @@ def call(Map config = [:]) {
         sh """
           if [ -d ${rhevm_qe_infra_dir} ]; then
             pushd ${rhevm_qe_infra_dir}
-            git fetch ${rhevm_qe_infra_url} ${it} && git cherry-pick FETCH_HEAD || (
-                echo '!!! FAIL TO CHERRYPICK' ${it} ; false
+            git fetch ${rhevm_qe_infra_url} ${it} && git checkout FETCH_HEAD || (
+                echo '!!! FAIL WHILE CHECKOUT' ${it} ; false
             )
             popd
           fi
